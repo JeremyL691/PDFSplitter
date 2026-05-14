@@ -24,7 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--source",
-        choices=["auto", "outline", "toc"],
+        choices=["auto", "outline", "toc", "scan"],
         default="auto",
         help="How to detect the book structure. Default: auto.",
     )

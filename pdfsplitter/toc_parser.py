@@ -10,12 +10,80 @@ from pypdf import PdfReader
 TOC_HEADING_RE = re.compile(r"\b(contents|table of contents)\b", re.IGNORECASE)
 TRAILING_PAGE_RE = re.compile(r"^(?P<title>.+?)\s+\.{0,}\s*(?P<page>\d{1,4})$")
 NUMBERED_TITLE_RE = re.compile(
-    r"^(?P<label>(?:chapter\s+\d+|\d+(?:\.\d+)*))(?P<rest>\s+.+)?$",
+    r"^(?P<label>(?:chapter\s+\d+|\d+(?:\.\d+)*\.?))(?P<rest>\s+.+)?$",
+    re.IGNORECASE,
+)
+GENERIC_PREFIX_RE = re.compile(
+    r"^(?P<prefix>chapter|part|book|unit|lesson|lecture|module|appendix|appendices|section)\s+"
+    r"(?P<label>[A-Za-z0-9]+(?:[.\-][A-Za-z0-9]+)*\.?)(?P<rest>(?:\s+|:|-).+)?$",
+    re.IGNORECASE,
+)
+BARE_HIERARCHY_RE = re.compile(
+    r"^(?P<label>(?:\d+(?:[.\-][A-Za-z0-9]+)*\.?|[IVXLCDM]+\.|[A-Za-z]\.(?:\d+(?:[.\-]\d+)*)?))(?P<rest>\s+.+)?$",
     re.IGNORECASE,
 )
 ROMAN_NUMERAL_RE = re.compile(r"^[ivxlcdm]+$", re.IGNORECASE)
 DIGITS_ONLY_RE = re.compile(r"^\d{1,4}$")
 TRAILING_ROMAN_PAGE_RE = re.compile(r"^.+\s+[ivxlcdm]+$", re.IGNORECASE)
+
+SMALL_NUMBER_WORDS: dict[str, int] = {
+    "zero": 0,
+    "one": 1,
+    "first": 1,
+    "two": 2,
+    "second": 2,
+    "three": 3,
+    "third": 3,
+    "four": 4,
+    "fourth": 4,
+    "five": 5,
+    "fifth": 5,
+    "six": 6,
+    "sixth": 6,
+    "seven": 7,
+    "seventh": 7,
+    "eight": 8,
+    "eighth": 8,
+    "nine": 9,
+    "ninth": 9,
+    "ten": 10,
+    "tenth": 10,
+    "eleven": 11,
+    "eleventh": 11,
+    "twelve": 12,
+    "twelfth": 12,
+    "thirteen": 13,
+    "thirteenth": 13,
+    "fourteen": 14,
+    "fourteenth": 14,
+    "fifteen": 15,
+    "fifteenth": 15,
+    "sixteen": 16,
+    "sixteenth": 16,
+    "seventeen": 17,
+    "seventeenth": 17,
+    "eighteen": 18,
+    "eighteenth": 18,
+    "nineteen": 19,
+    "nineteenth": 19,
+    "twenty": 20,
+    "twentieth": 20,
+    "thirty": 30,
+    "thirtieth": 30,
+    "forty": 40,
+    "fortieth": 40,
+    "fifty": 50,
+    "fiftieth": 50,
+    "sixty": 60,
+    "sixtieth": 60,
+    "seventy": 70,
+    "seventieth": 70,
+    "eighty": 80,
+    "eightieth": 80,
+    "ninety": 90,
+    "ninetieth": 90,
+    "hundred": 100,
+}
 
 
 @dataclass(frozen=True)
@@ -47,16 +115,91 @@ def clean_toc_title(title: str) -> str:
     return normalize_text(title).strip(" .")
 
 
-def title_to_label(title: str) -> tuple[int, ...]:
-    match = NUMBERED_TITLE_RE.match(clean_toc_title(title))
-    if not match:
+def _roman_to_int(token: str) -> int | None:
+    roman = token.upper()
+    if not roman or not ROMAN_NUMERAL_RE.fullmatch(roman):
+        return None
+    values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+    total = 0
+    prev = 0
+    for char in reversed(roman):
+        value = values[char]
+        if value < prev:
+            total -= value
+        else:
+            total += value
+            prev = value
+    return total if total > 0 else None
+
+
+def _word_to_int(token: str) -> int | None:
+    token = token.lower().replace("-", " ").strip()
+    if token in SMALL_NUMBER_WORDS:
+        return SMALL_NUMBER_WORDS[token]
+    parts = token.split()
+    if not parts:
+        return None
+    total = 0
+    current = 0
+    for part in parts:
+        value = SMALL_NUMBER_WORDS.get(part)
+        if value is None:
+            return None
+        if value == 100:
+            current = max(current, 1) * 100
+        else:
+            current += value
+    total += current
+    return total if total > 0 else None
+
+
+def _alpha_to_int(token: str) -> int | None:
+    return ord(token.upper()) - ord("A") + 1 if len(token) == 1 and token.isalpha() else None
+
+
+def _parse_label_component(token: str) -> int | None:
+    token = token.strip().rstrip(".")
+    if not token:
+        return None
+    if token.isdigit():
+        return int(token)
+    if (word_value := _word_to_int(token)) is not None:
+        return word_value
+    if (roman_value := _roman_to_int(token)) is not None:
+        return roman_value
+    if (alpha_value := _alpha_to_int(token)) is not None:
+        return alpha_value
+    return None
+
+
+def _parse_hierarchy(raw_label: str) -> tuple[int, ...]:
+    cleaned = raw_label.strip().rstrip(".")
+    if not cleaned:
         return ()
-    raw = match.group("label").lower()
-    if raw.startswith("chapter "):
-        suffix = raw.split()[1]
-        return (int(suffix),) if suffix.isdigit() else ()
-    parts = [part for part in raw.split(".") if part]
-    return tuple(int(part) for part in parts) if all(part.isdigit() for part in parts) else ()
+    parts = [part for part in re.split(r"[.\-]", cleaned) if part]
+    values: list[int] = []
+    for part in parts:
+        parsed = _parse_label_component(part)
+        if parsed is None:
+            return ()
+        values.append(parsed)
+    return tuple(values)
+
+
+def title_to_label(title: str) -> tuple[int, ...]:
+    cleaned = clean_toc_title(title)
+    if not cleaned:
+        return ()
+
+    for pattern in (GENERIC_PREFIX_RE, NUMBERED_TITLE_RE, BARE_HIERARCHY_RE):
+        match = pattern.match(cleaned)
+        if not match:
+            continue
+        raw_label = match.group("label")
+        parsed = _parse_hierarchy(raw_label)
+        if parsed:
+            return parsed
+    return ()
 
 
 def _extract_lines(text: str) -> list[str]:

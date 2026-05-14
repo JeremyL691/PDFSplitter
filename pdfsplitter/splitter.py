@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import asdict, dataclass
 import json
 from pathlib import Path
@@ -9,7 +10,15 @@ from typing import Any
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import Destination
 
-from .toc_parser import TocEntry, parse_toc_entries, resolve_toc_page_indices, title_to_label
+from .toc_parser import (
+    TocEntry,
+    clean_toc_title,
+    find_toc_page_span,
+    normalize_text,
+    parse_toc_entries,
+    resolve_toc_page_indices,
+    title_to_label,
+)
 
 
 SAFE_CHAR_RE = re.compile(r"[^A-Za-z0-9._'() -]+")
@@ -37,6 +46,13 @@ class SplitItem:
     @property
     def page_count(self) -> int:
         return self.end_page - self.start_page + 1
+
+
+@dataclass(frozen=True)
+class ChapterGroup:
+    entry: BookmarkEntry
+    dir_name: str
+    order: int
 
 
 def sanitize_name(value: str) -> str:
@@ -84,7 +100,30 @@ def _dedupe_and_sort_bookmarks(entries: list[BookmarkEntry]) -> list[BookmarkEnt
     deduped: dict[tuple[tuple[int, ...], int], BookmarkEntry] = {}
     for entry in entries:
         deduped[(entry.label, entry.page_index)] = entry
-    return sorted(deduped.values(), key=lambda item: (item.page_index, item.level, item.label))
+    ordered = sorted(deduped.values(), key=lambda item: (item.page_index, item.level, item.label))
+    return _filter_redundant_chapter_entries(ordered)
+
+
+def _filter_redundant_chapter_entries(entries: list[BookmarkEntry]) -> list[BookmarkEntry]:
+    filtered: list[BookmarkEntry] = []
+    first_rich_chapter_by_label: dict[tuple[int, ...], BookmarkEntry] = {}
+
+    for entry in entries:
+        title = clean_toc_title(entry.title)
+        normalized = title.lower()
+        is_bare_chapter = bool(re.fullmatch(r"chapter\s+\d+", normalized))
+
+        if len(entry.label) == 1 and not is_bare_chapter:
+            first_rich_chapter_by_label.setdefault(entry.label, entry)
+            filtered.append(entry)
+            continue
+
+        if len(entry.label) == 1 and is_bare_chapter and entry.label in first_rich_chapter_by_label:
+            continue
+
+        filtered.append(entry)
+
+    return filtered
 
 
 def extract_toc_entries(reader: PdfReader) -> list[BookmarkEntry]:
@@ -102,8 +141,65 @@ def extract_toc_entries(reader: PdfReader) -> list[BookmarkEntry]:
     ]
 
 
+def extract_scanned_entries(reader: PdfReader) -> list[BookmarkEntry]:
+    toc_span = find_toc_page_span(reader)
+    toc_end_index = toc_span[1] if toc_span is not None else -1
+    candidates: list[BookmarkEntry] = []
+    seen: set[tuple[tuple[int, ...], int, str]] = set()
+
+    for page_index, page in enumerate(reader.pages):
+        if page_index <= toc_end_index:
+            continue
+        raw_lines = [normalize_text(line) for line in (page.extract_text() or "").splitlines()]
+        meaningful_lines: list[str] = []
+        for line in raw_lines:
+            if not line:
+                continue
+            lowered = line.lower()
+            if "page " in lowered and " of " in lowered:
+                continue
+            if lowered.startswith("sid:"):
+                continue
+            if "course notes export" in lowered:
+                continue
+            if lowered.startswith("generated:"):
+                continue
+            meaningful_lines.append(line)
+            if len(meaningful_lines) >= 3:
+                break
+
+        lines = meaningful_lines
+        for line in lines:
+            title = clean_toc_title(line)
+            if not re.search(r"[A-Za-z]", title):
+                continue
+            if title.startswith(("(", "[", "{")):
+                continue
+            if title.lower().startswith("solution"):
+                continue
+            label = title_to_label(title)
+            if not label:
+                continue
+            if len(title) > 180:
+                continue
+            key = (label, page_index, title.lower())
+            if key in seen:
+                continue
+            seen.add(key)
+            candidates.append(
+                BookmarkEntry(
+                    title=title,
+                    page_index=page_index,
+                    level=1,
+                    label=label,
+                )
+            )
+            break
+    return _dedupe_and_sort_bookmarks(candidates)
+
+
 def load_structure(reader: PdfReader, source: str = "auto") -> tuple[list[BookmarkEntry], str]:
-    if source not in {"auto", "outline", "toc"}:
+    if source not in {"auto", "outline", "toc", "scan"}:
         raise ValueError(f"Unsupported source {source!r}")
 
     if source in {"auto", "outline"}:
@@ -113,8 +209,15 @@ def load_structure(reader: PdfReader, source: str = "auto") -> tuple[list[Bookma
         if source == "outline":
             return [], "outline"
 
-    toc_entries = extract_toc_entries(reader)
-    return toc_entries, "toc"
+    if source in {"auto", "toc"}:
+        toc_entries = extract_toc_entries(reader)
+        if toc_entries:
+            return toc_entries, "toc"
+        if source == "toc":
+            return [], "toc"
+
+    scanned_entries = extract_scanned_entries(reader)
+    return scanned_entries, "scan"
 
 
 def _chapter_label(label: tuple[int, ...]) -> str:
@@ -131,46 +234,77 @@ def build_split_items(
     include_chapter_intro: bool = True,
     max_section_depth: int | None = None,
 ) -> list[SplitItem]:
-    chapters = [entry for entry in entries if len(entry.label) == 1]
-    sections = [entry for entry in entries if len(entry.label) >= 2]
+    ordered_entries = sorted(entries, key=lambda item: (item.page_index, item.level, item.label))
+    chapters = [entry for entry in ordered_entries if len(entry.label) == 1]
+    sections = [entry for entry in ordered_entries if len(entry.label) >= 2]
+
+    if not chapters and sections:
+        chapters = _synthesize_chapters_from_sections(sections)
     if not chapters:
         raise ValueError("No numbered chapter entries were found.")
-    if not sections:
-        raise ValueError("No numbered section entries were found under the chapters.")
 
-    chapter_map = {entry.label[0]: entry for entry in chapters}
-    section_depth = max_section_depth or max(len(entry.label) for entry in sections)
-    target_sections = [entry for entry in sections if len(entry.label) == section_depth]
-    if not target_sections:
-        raise ValueError(f"No sections were found at depth {section_depth}.")
+    chapters = sorted(chapters, key=lambda item: (item.page_index, item.level, item.label))
+    if max_section_depth is not None:
+        section_depth = max_section_depth
+    elif sections:
+        depth_counts = Counter(len(entry.label) for entry in sections)
+        most_common_count = max(depth_counts.values())
+        section_depth = min(
+            depth for depth, count in depth_counts.items() if count == most_common_count
+        )
+    else:
+        section_depth = None
 
-    ordered_targets = sorted(target_sections, key=lambda item: (item.page_index, item.label))
+    target_sections = (
+        [entry for entry in sections if len(entry.label) == section_depth]
+        if section_depth is not None
+        else []
+    )
     split_items: list[SplitItem] = []
 
-    by_chapter: dict[int, list[BookmarkEntry]] = {}
-    for section in ordered_targets:
-        by_chapter.setdefault(section.label[0], []).append(section)
+    chapter_groups = _make_chapter_groups(chapters)
 
-    ordered_labels = sorted(chapter_map)
-    for position, chapter_number in enumerate(ordered_labels):
-        chapter_entry = chapter_map[chapter_number]
-        chapter_sections = sorted(by_chapter.get(chapter_number, []), key=lambda item: item.page_index)
-        if not chapter_sections:
-            continue
-
+    for chapter_index, chapter_group in enumerate(chapter_groups):
+        chapter_entry = chapter_group.entry
+        next_chapter_page = (
+            chapter_groups[chapter_index + 1].entry.page_index
+            if chapter_index + 1 < len(chapter_groups)
+            else total_pages
+        )
+        chapter_sections = [
+            section
+            for section in target_sections
+            if chapter_entry.page_index <= section.page_index < next_chapter_page
+        ]
+        chapter_label = _section_label(chapter_entry.label)
         chapter_title = _strip_number_prefix(chapter_entry.title)
-        chapter_dir_name = sanitize_name(f"Chapter {chapter_number} - {chapter_title}")
+        chapter_dir_name = chapter_group.dir_name
 
-        if include_chapter_intro and chapter_entry.page_index < chapter_sections[0].page_index:
-            intro_end = chapter_sections[0].page_index - 1
+        if not chapter_sections:
             split_items.append(
                 SplitItem(
-                    chapter_label=str(chapter_number),
+                    chapter_label=chapter_label,
+                    chapter_title=chapter_title,
+                    section_label=chapter_label or "01",
+                    section_title=chapter_title,
+                    start_page=chapter_entry.page_index + 1,
+                    end_page=next_chapter_page,
+                    chapter_dir_name=chapter_dir_name,
+                    file_name=sanitize_name(f"01 {chapter_title}.pdf"),
+                )
+            )
+            continue
+
+        if include_chapter_intro and chapter_entry.page_index < chapter_sections[0].page_index:
+            intro_end = chapter_sections[0].page_index
+            split_items.append(
+                SplitItem(
+                    chapter_label=chapter_label,
                     chapter_title=chapter_title,
                     section_label="00",
                     section_title="Chapter Intro",
                     start_page=chapter_entry.page_index + 1,
-                    end_page=intro_end + 1,
+                    end_page=intro_end,
                     chapter_dir_name=chapter_dir_name,
                     file_name="00 Chapter Intro.pdf",
                 )
@@ -180,7 +314,7 @@ def build_split_items(
             next_start = (
                 chapter_sections[index + 1].page_index
                 if index + 1 < len(chapter_sections)
-                else _chapter_end_page_index(chapter_number, ordered_labels, chapter_map, total_pages)
+                else next_chapter_page
             )
             start_page = section.page_index + 1
             end_page = next_start
@@ -188,7 +322,7 @@ def build_split_items(
             file_name = sanitize_name(f"{index + 1:02d} {section_label} {_strip_number_prefix(section.title)}.pdf")
             split_items.append(
                 SplitItem(
-                    chapter_label=str(chapter_number),
+                    chapter_label=chapter_label,
                     chapter_title=chapter_title,
                     section_label=section_label,
                     section_title=_strip_number_prefix(section.title),
@@ -205,21 +339,49 @@ def _drop_invalid_ranges(items: list[SplitItem]) -> list[SplitItem]:
     return [item for item in items if item.start_page <= item.end_page]
 
 
-def _chapter_end_page_index(
-    chapter_number: int,
-    ordered_labels: list[int],
-    chapter_map: dict[int, BookmarkEntry],
-    total_pages: int,
-) -> int:
-    position = ordered_labels.index(chapter_number)
-    if position + 1 < len(ordered_labels):
-        return chapter_map[ordered_labels[position + 1]].page_index
-    return total_pages
+def _synthesize_chapters_from_sections(sections: list[BookmarkEntry]) -> list[BookmarkEntry]:
+    synthesized: list[BookmarkEntry] = []
+    seen: set[tuple[int, int]] = set()
+    for section in sorted(sections, key=lambda item: (item.page_index, item.level, item.label)):
+        chapter_label = (section.label[0],)
+        key = (section.page_index, chapter_label[0])
+        if key in seen:
+            continue
+        seen.add(key)
+        synthesized.append(
+            BookmarkEntry(
+                title=f"Chapter {section.label[0]}",
+                page_index=section.page_index,
+                level=max(1, section.level - 1),
+                label=chapter_label,
+            )
+        )
+    return synthesized
+
+
+def _make_chapter_groups(chapters: list[BookmarkEntry]) -> list[ChapterGroup]:
+    counts: dict[str, int] = {}
+    groups: list[ChapterGroup] = []
+    for order, chapter in enumerate(chapters, start=1):
+        chapter_label = _section_label(chapter.label)
+        chapter_title = _strip_number_prefix(chapter.title)
+        base_name = sanitize_name(
+            f"Chapter {chapter_label} - {chapter_title}" if chapter_label else chapter_title
+        )
+        counts[base_name] = counts.get(base_name, 0) + 1
+        dir_name = base_name if counts[base_name] == 1 else sanitize_name(f"{base_name} ({counts[base_name]})")
+        groups.append(ChapterGroup(entry=chapter, dir_name=dir_name, order=order))
+    return groups
 
 
 def _strip_number_prefix(title: str) -> str:
     title = title.strip()
-    title = re.sub(r"^(chapter\s+\d+|\d+(?:\.\d+)*)\s*", "", title, flags=re.IGNORECASE)
+    title = re.sub(
+        r"^((chapter|part|book|unit|lesson|lecture|module|appendix|appendices|section)\s+[A-Za-z0-9]+(?:[.\-][A-Za-z0-9]+)*|\d+(?:[.\-]\d+)*\.?|[A-Za-z](?:[.\-]\d+)*)\s*",
+        "",
+        title,
+        flags=re.IGNORECASE,
+    )
     return title.strip(" .:-") or title
 
 
