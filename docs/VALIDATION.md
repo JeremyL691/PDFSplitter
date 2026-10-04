@@ -1,12 +1,12 @@
-# v0.3.0 验收记录
+# v0.3.0 validation record
 
-本次交付包括章节识别修复、统一分析/校验/导出接口、原生 OCR 辅助程序、预览校正界面、CLI、回归测试及 CI 配置。以下结果区分实际运行与尚未验收的范围。
+This iteration delivers chapter-detection fixes, shared analysis/validation/export interfaces, a native OCR helper, preview correction, CLI support, regressions, and CI configuration. Results below distinguish actual execution from pending acceptance.
 
-## 本机环境与运行结果
+## Local environment and results
 
-实际环境为 Apple Silicon arm64、macOS 27.0（26A428）、Python 3.12.0，Swift 6.4。辅助程序以 macOS 13 为部署目标构建；部署目标不等于旧系统实机验收。
+Tested on Apple Silicon arm64, macOS 27.0 (26A428), Python 3.12.0, and Swift 6.4. The helper targets macOS 13; a deployment target does not establish acceptance on older systems.
 
-仓库展示整理后、推送前再次启用全部原生和桌面测试，**33 项测试通过，无跳过**。原始日志见 [test-run.txt](evidence/test-run.txt)。运行命令：
+The full native and desktop suite was rerun before publication: **33 tests passed with no skips**. See [test-run.txt](evidence/test-run.txt).
 
 ```bash
 PDFSPLITTER_NATIVE_TESTS=1 PDFSPLITTER_GUI_TESTS=1 \
@@ -15,43 +15,43 @@ PYTHONDONTWRITEBYTECODE=1 python3.12 -m unittest discover -v
 python3.12 -m tests.acceptance
 ```
 
-| 检查类别 | 证据与范围 |
+| Category | Evidence and scope |
 | --- | --- |
-| 结构与导出，15 项 | 真实生成 PDF：重复章号、Part 层级、仅小节书签、嵌套小节、部分书签、正文提前引用、目录按顺序匹配、中文与 Appendix 编号、同页双语标题与小节、非法深度、路径与哈希校验、原始页面内容流一致、清单和输出页数 |
-| 故障恢复，9 项 | 控制注入超时、单页错误和取消，验证进程关闭/重启与后续页面继续；缓存复用和参数失效、人工文字与待比较 OCR 保存、源文件与硬链接冲突、坏书签、CLI 计划流程 |
-| 真实 Vision，5 项 | 英文、简体、繁体、同一行中英混排，英文优先遗漏中文的回归；真实扫描目录、双栏目录、原生与扫描混合页、旋转页与 CropBox、缓存和强制识别。比较预先定义的文字、编号、边界与位置，未以“有返回文字”作为成功条件 |
-| 桌面 Tk，4 项 | 实际创建窗口并调用真实应用流程；320/768/1024/1440 宽度，浅色/深色/系统主题、减少动效；文字校正与重建、条目合并/拆分/排除恢复、人工修改与重新 OCR 冲突、批处理错误隔离、实际导出，捕获 Tk 回调异常 |
+| Structure/export, 15 tests | Generated PDFs with repeated numbers, Parts, section-only and nested bookmarks, partial bookmarks, early body references, ordered contents mapping, Chinese/Appendix numbering, same-page bilingual headings and sections, invalid depths, paths and hashes, original content-stream equality, manifest/file counts |
+| Recovery, 9 tests | Injected timeouts, page errors, and cancellation verify process closure/restart and subsequent-page continuation; cache reuse/invalidation, manual/pending text persistence, source/hard-link conflicts, invalid bookmarks, CLI plans |
+| Real Vision, 5 tests | English, Simplified/Traditional Chinese, mixed text on one line, English-pass Chinese omission regression; scanned and two-column contents, native/scanned mixed pages, rotation, CropBox, caching, forced recognition. Predefined text, numbers, boundaries, and positions are checked, not merely the presence of returned text |
+| Desktop Tk, 4 tests | Actual windows and application flows; widths 320/768/1024/1440, light/dark/system themes, reduced motion; corrections/rebuild, merge/divide/exclude/restore, manual edits versus OCR reruns, batch failure isolation, actual export, and Tk callback exception capture |
 
-超时与取消的故障测试使用可控替身，不宣称真实 Vision 在故障压力下已全部实测。正常 OCR 测试调用本机 Vision，不使用 OCR mock。
+Timeout and cancellation fault tests use controlled substitutes. They do not establish that all real Vision pressure failures have been tested. Normal OCR tests call local Vision without OCR mocks.
 
-## 可重复的真实扫描样本
+## Reproducible scan sample
 
-[annotated-scan.pdf](evidence/annotated-scan.pdf) 是本次生成的四页纯图片 PDF；[annotation.json](evidence/annotation.json) 保存预先定义的文字与范围。目录页为第 1 页，正文范围应为第 2、3、4 页，各输出一个单页 PDF。
+[annotated-scan.pdf](evidence/annotated-scan.pdf) is a four-page image-only PDF generated for this iteration. [annotation.json](evidence/annotation.json) contains predefined text and ranges. Page 1 contains the contents; pages 2, 3, and 4 each produce a single-page PDF.
 
-[native-acceptance.json](evidence/native-acceptance.json) 与 [verified-plan.json](evidence/verified-plan.json) 记录实际识别（计划中输入路径已转为仓库根目录下的相对路径，内容哈希不变）：全文逐页文字与标注一致，范围为 `[[2,2],[3,3],[4,4]]`，实际导出 3 个 PDF，输入哈希保持不变。另有原始页面内容流一致性回归测试。
+[native-acceptance.json](evidence/native-acceptance.json) and [verified-plan.json](evidence/verified-plan.json) record recognition. The plan uses an input path relative to the repository root with the original hash. Every page matches the annotation, ranges are `[[2,2],[3,3],[4,4]]`, three PDFs were exported, and the source hash is unchanged. Additional regressions compare original page content streams.
 
-样本第 2 页虽然文字正确，模型仍给出低置信度；应用产生 `low_confidence` 告警并要求复核。此项展示置信度的诊断用途，不把置信度当作准确率。
+Page 2 is recognized correctly but receives low model confidence. The application emits `low_confidence` and requires review, demonstrating confidence as a diagnostic rather than an accuracy measure.
 
-历史教材原文件未能获取，因此没有把旧拆分产物算作本轮重跑验收。以上使用仓库内可访问、带标注的新样本。
+The historical textbook source was unavailable. Old split outputs were not counted as a rerun. Acceptance uses new accessible samples with annotations.
 
-## 界面对比与桌面交互
+## Interface comparison and desktop interaction
 
-原版截图从仓库原 HEAD `1d29020` 的临时副本启动后获取。新版截图来自实际运行的 Tk 应用，显示扫描目录预览、文字框、识别结果、缓存状态与复核状态。
+The original screenshot comes from a temporary checkout of baseline `1d29020`. Updated screenshots show the running Tk application with a scanned contents preview, boxes, recognized text, cache state, and review status.
 
-| 原版 | 新版浅色 | 新版深色 |
+| Original | Updated light | Updated dark |
 | --- | --- | --- |
 | ![Before](evidence/ui-before.jpg) | ![Light](evidence/ui-after-light.jpg) | ![Dark](evidence/ui-after-dark.jpg) |
 
-原生文件选择器已通过桌面键盘操作打开并选取验收 PDF。自动化测试验证了带空格的多文件拖拽数据解析及批处理入口。**Finder 到应用的真实鼠标拖拽仍待人工验收**：当前桌面自动化可以操作原生文件对话框和键盘，但 Tk 控件的坐标点击未产生可靠的控件事件，不能把调用成功算作拖拽通过。
+The native file picker was opened by keyboard and used to select the acceptance PDF. Tests validate multiple-file drag data with spaces and the batch entry point. **Physical Finder-to-application dragging remains pending:** desktop automation could operate the native dialog and keyboard, but coordinate clicks did not reliably produce Tk control events. Successful tool calls were not counted as completed dragging.
 
-人工复验入口：`python3.12 -m tests.gui_demo --theme light`。可拖入多个 PDF，检查文件逐个分析；修改文字并保存、重建计划；重新 OCR 后保留人工结果；检查边界、接受非致命告警，导出至新目录。关闭窗口应取消任务并等待暂存清理。
+Manual entry point: `python3.12 -m tests.gui_demo --theme light`. Drag multiple PDFs and inspect sequential analysis; correct text and rebuild; rerun OCR while preserving edits; check boundaries and acknowledge reviewed nonfatal warnings; export to a new directory. Closing the window should cancel work and wait for staging cleanup.
 
-## CI、兼容性和剩余验收
+## CI, compatibility, and remaining acceptance
 
-`.github/workflows/tests.yml` 包含 Linux 核心测试及 macOS 原生 OCR 测试。配置已交付，**远端 CI 尚未运行**。GUI 测试需要图形桌面，在本机单独启用。
+`.github/workflows/tests.yml` defines Linux core tests and macOS native OCR tests. The configuration is published, but **remote CI has not run; GitHub Actions is currently disabled for the repository**. GUI tests need a graphical session and are enabled locally.
 
-macOS 13/14、Intel Mac、其他 Python 版本尚未实机验证；不能据当前 Apple Silicon 的结果宣称兼容性全部通过。完整安装包与可搜索 PDF 文字层属于后续范围。
+macOS 13/14, Intel Macs, and other Python versions have not received hardware acceptance. Current Apple Silicon results do not establish those combinations. An installer and searchable PDF text layers remain future scope.
 
-清晰合成样本已通过，倾斜/模糊扫描、手写、公式、复杂多栏、特殊字体或大量页眉页脚仍需人工复核。布局恢复与目录映射采用位置和顺序证据，无法保证所有排版。系统 Vision 更新可能改变文字结果，缓存键含系统与处理版本。
+Clear synthetic samples pass. Skew, blur, handwriting, formulas, complex columns, unusual fonts, and frequent headers/footers still require manual review. Layout recovery and contents mapping use positional and ordering evidence and cannot guarantee every layout. Vision updates may change results; cache keys include system and processing versions.
 
-当前代码与本机自动验收可使用；M5 中跨平台、远端 CI 与真实 Finder 拖拽的验收尚未全部关闭。
+The implementation and local automated acceptance are usable. Cross-platform, remote CI, and physical Finder dragging gates in M5 remain open.

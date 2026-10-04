@@ -1,11 +1,11 @@
-## 改动
+## Changes
 
-描述具体问题、触发条件与修复后的行为。
+Describe the concrete problem, trigger, and resulting behavior.
 
-## 验证
+## Validation
 
-记录实际执行的测试、平台、结果与跳过项。OCR、桌面和兼容性验证请分别说明。
+List tests actually executed, platforms, results, and skips. Describe OCR, desktop, and compatibility validation separately.
 
-## 剩余限制
+## Remaining limitations
 
-说明仍需复核或尚未验证的行为；涉及使用方式变更时链接更新后的文档。
+Identify behavior still requiring review or validation. Link updated documentation when usage changes.

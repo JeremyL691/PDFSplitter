@@ -1,29 +1,29 @@
-# 更新记录
+# Changelog
 
-## v0.3.0 - 开发预览
+## v0.3.0 - Development preview
 
-此轮代码已进入仓库，正式版本发布验收尚未完成。具体证据与未关闭项目见 [项目状态](docs/STATUS.md) 和 [验收记录](docs/VALIDATION.md)。
+The implementation is available in the repository; formal release acceptance remains incomplete. See [project status](docs/STATUS.md) and [validation](docs/VALIDATION.md) for evidence and open items.
 
-### 新增
+### Added
 
-- macOS PDFKit / Vision 原生 OCR、英文与中文双通道、位置框和识别候选。
-- 统一的页面文本、结构与拆分计划对象；分析、校验与导出分离。
-- 页面预览、文字校正、章节范围编辑、计划保存/加载与重新 OCR 冲突处理。
-- 逐页状态、缓存、取消、单页失败隔离及批处理。
-- CLI OCR 配置、dry-run、apply-plan、显式告警接受与复核退出码。
-- 最终文字、OCR JSON 和计划 JSON 导出；真实原生测试、标注样本与 CI 配置。
+- Native macOS PDFKit / Vision OCR, English and Chinese recognition passes, text boxes, and alternatives.
+- Shared page text, structure, and split-plan models with separate analysis, validation, and export interfaces.
+- Page previews, text correction, chapter-range editing, saved plans, and conflict handling for OCR reruns.
+- Per-page status, caching, cancellation, isolated page failures, and batch processing.
+- CLI OCR settings, dry-run, apply-plan, explicit warning acceptance, and a review exit code.
+- Final text, OCR JSON, and plan JSON exports; native tests, annotated samples, and CI configuration.
 
-### 修复
+### Fixed
 
-- 重复章号、Part 父节点、小节书签合成章节及同页标题分组。
-- 中文编号、Appendix 字母、英文复合数字、正文引用与目录映射。
-- 非法深度、输出路径、重名、范围和输入一致性校验。
-- 输出目录覆盖与旧文件混入风险，改为独立暂存并整体发布。
+- Repeated chapter numbers, Part parents, chapter synthesis from section-only bookmarks, and same-page heading groups.
+- Chinese numbering, Appendix letters, compound English numbers, body references, and contents-page mapping.
+- Invalid depths, output paths, duplicate names, page ranges, and input consistency checks.
+- Output overwrite and stale-file risks through independent staging and whole-directory publication.
 
-### 后续
+### Pending
 
-补齐 Finder 真实拖拽、远端 CI、旧版 macOS / Intel 与复杂真实文档验收。可搜索 PDF 文字层、安装包和其他平台 OCR 不在本轮范围。
+Physical Finder drag-and-drop, remote CI, older macOS / Intel validation, and complex real-document acceptance. Searchable PDF layers, an installer, and OCR on other platforms are outside this iteration.
 
 ## v0.2.0
 
-此前的版本基线，提交 `1d29020`。v0.3.0 在此基础上加入分析复核流程与原生 OCR。
+Previous baseline at commit `1d29020`. v0.3.0 adds the analysis and review workflow and native OCR on top of that version.

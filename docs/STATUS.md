@@ -1,42 +1,42 @@
-# 项目状态
+# Project status
 
-更新日期：2026-10-03（America/Los_Angeles）。此文件描述当前工作区，提交或后续修改后应重新核对。
+Updated: 2026-10-03 (America/Los_Angeles). Recheck this record against the current source and Git state after subsequent changes.
 
-## 当前结论
+## Current assessment
 
-v0.3.0 主体代码已经实现，可在本机运行分析、OCR、预览校正与安全导出。最近完整本机测试为 **33 项通过，无跳过**，详见 [验收记录](VALIDATION.md) 及原始日志。发布到仓库前已重新运行完整本机测试，33 项通过，无跳过。
+The v0.3.0 core implementation supports local analysis, OCR, preview correction, and safe export. The latest complete local suite passed **33 tests with no skips**, including a rerun before repository publication. See the [validation record](VALIDATION.md) and raw log.
 
-本轮开发起点为 `1d29020`（v0.2.0）；v0.3.0 代码、测试、文档与证据随本轮仓库更新提交。尚未打 v0.3.0 标签或发布正式版本。接续者应检查实际 Git 状态，保留现有成果，不得重置回旧版本后重新实现。
+Development started at `1d29020` (v0.2.0). The v0.3.0 implementation, tests, documentation, and evidence were published in the repository update. No v0.3.0 tag or formal release has been created. Inspect the actual Git state and preserve the existing work instead of resetting to the old baseline.
 
-## 阶段进度
+## Milestones
 
-| 阶段 | 已交付 | 尚待确认 |
+| Milestone | Delivered | Still to verify |
 | --- | --- | --- |
-| M1 正确性与安全导出 | 独立章节身份/父节点、Part 与重复章号、小节书签合成章节、中文与 Appendix 编号、目录顺序匹配、严格深度与范围校验、输入哈希、暂存与整体发布、回归测试 | 独立代码复核及更多真实长文档边界案例 |
-| M2 原生 OCR | Swift PDFKit/Vision 辅助程序、能力查询、协议版本、渲染/位置、双通道识别、CLI 参数、逐页错误隔离、超时/取消、缓存 | macOS 13/14 与 Intel 实机；真实故障压力下的长任务恢复 |
-| M3 统一计划与文本产物 | PageText / StructureEntry / SplitPlan，分析/校验/导出接口、布局合并、扫描目录与混合页分析、文本与 JSON 产物 | 复杂排版、低质量扫描及更大文档集合的评估 |
-| M4 预览与校正 | 实时页面状态、缩放和位置框、文字与条目编辑、重新 OCR 候选、保存/加载计划、批处理、三种主题及响应式布局 | Finder 真实拖拽、更多人工键盘/辅助功能操作与完整桌面复验 |
-| M5 全面验收与版本整理 | 本机 33 项测试、真实标注样本、界面前后截图、使用文档、CI 配置 | 远端 CI、跨平台实机、人工拖拽、发布前独立复核及 Git 版本交付 |
+| M1 Correctness and safe export | Independent chapter identities and parents, Parts and repeated numbering, section-only bookmark synthesis, Chinese and Appendix numbering, ordered contents matching, strict depth and range validation, source hashing, staged publication, regressions | Independent review and more boundary cases from real long documents |
+| M2 Native OCR | Swift PDFKit/Vision helper, capability checks, versioned protocol, rendering and positions, two recognition passes, CLI options, page failure isolation, timeout/cancellation, caching | macOS 13/14 and Intel hardware; recovery under real long-running failures |
+| M3 Shared plans and text | PageText / StructureEntry / SplitPlan, analysis/validation/export interfaces, layout merging, scanned contents and mixed-page analysis, text and JSON outputs | Complex layouts, poor scans, and a broader document collection |
+| M4 Preview and correction | Live page status, zoom and text boxes, text and item editing, OCR alternatives, saved plans, batch processing, three themes, responsive layout | Physical Finder dragging, additional keyboard/accessibility checks, full manual desktop acceptance |
+| M5 Acceptance and version preparation | 33 local tests, real annotated samples, before/after screenshots, guides, CI configuration, Git repository delivery | Remote CI, platform hardware tests, physical dragging, independent release review |
 
-M1-M4 已有实现和本机验证，仍需扩大验收覆盖；**M5 未完成，不能将当前状态称为完整发布验收通过**。
+M1-M4 have implementations and local evidence, with broader acceptance still needed. **M5 is incomplete; the current state is not full release acceptance.**
 
-## 已有证据
+## Available evidence
 
-- 本机：Apple Silicon arm64、macOS 27.0（26A428）、Python 3.12.0、Swift 6.4。
-- 33 项测试：15 项结构/导出、9 项故障恢复、5 项真实 Vision、4 项桌面 Tk。
-- 仓库内四页纯图片样本的文字与预先定义的标注一致，拆分范围为 `[[2,2],[3,3],[4,4]]`，导出 3 个 PDF，源文件哈希不变。
-- 同一行中英混排、英文通道遗漏中文、双栏扫描目录、原生/扫描混合页、旋转与 CropBox 已有真实原生测试。
-- 320/768/1024/1440 宽度已有真实 Tk 窗口几何与控件边界测试；界面对比截图为实际应用运行画面。
-- `git diff --check` 在本轮实现与文档整理时均通过。
+- Local platform: Apple Silicon arm64, macOS 27.0 (26A428), Python 3.12.0, Swift 6.4.
+- 33 tests: 15 structure/export, 9 fault recovery, 5 real Vision, and 4 desktop Tk.
+- The four-page image-only sample matches predefined text annotations and ranges `[[2,2],[3,3],[4,4]]`, exports three PDFs, and preserves the source hash.
+- Real native tests cover mixed text on one line, Chinese omitted by the English pass, two-column scanned contents, native/scanned mixed pages, rotation, and CropBox.
+- Actual Tk geometry and control-boundary tests cover widths 320/768/1024/1440. Comparison screenshots show running applications.
+- `git diff --check` passed during implementation and documentation preparation.
 
-置信度不是准确率；正确识别的样本仍可能触发复核。受控超时/取消测试使用替身，不能等同于真实 Vision 故障压力测试。Finder 拖拽数据解析通过不等同于 Finder 真实拖拽通过。
+Confidence is not accuracy; correctly recognized text may still require review. Controlled timeout/cancellation tests use substitutes and do not establish real Vision fault-pressure behavior. Parsing drag data does not establish physical Finder dragging.
 
-## 下一轮优先级
+## Next priorities
 
-1. 保留现有工作区，独立复核核心逻辑并重跑本机测试；发现问题先添加能复现实际行为的回归，再修复。
-2. 完成真实桌面复验，重点是多文件拖拽、人工修改后重新 OCR、边界校正、取消与安全导出；保存实际操作证据。
-3. 用新的可访问、预先人工标注的真实长文档扩大验收，重点覆盖模糊、复杂目录、旋转/裁剪和大页数内存行为。
-4. 在具备相应授权与环境后运行远端 CI、macOS 13/14 和 Intel 验收；缺少环境时明确保留未验证状态。
-5. 关闭 M5 后再整理版本发布。隐形文字层、完整安装包和其他平台 OCR 保持后续范围。
+1. Preserve existing work, independently review the core, and rerun local tests. Reproduce failures before adding meaningful regressions and fixes.
+2. Complete desktop acceptance for multiple-file dragging, OCR reruns after manual edits, boundary corrections, cancellation, and safe export. Save actual interaction evidence.
+3. Broaden testing with accessible real long documents and annotations prepared before recognition, including blur, complex contents, rotation/cropping, and memory behavior.
+4. Run remote CI and macOS 13/14 / Intel acceptance when authorized and equipped. Keep unsupported environments explicitly unverified.
+5. Prepare a formal release after closing M5. Searchable text layers, an installer, and other-platform OCR remain future scope.
 
-具体路径、命令与复核重点见 [开发交接](HANDOFF.md)。
+See the [handoff](HANDOFF.md) for commands and review targets.
