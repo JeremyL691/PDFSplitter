@@ -1,0 +1,37 @@
+{
+  "pages": [
+    [
+      "Contents",
+      "Chapter 1 Conditional Probability .... 1",
+      "1.1 Independent Events .... 2",
+      "Chapter 2 Random Variables .... 3"
+    ],
+    [
+      "Chapter 1 Conditional Probability",
+      "第一章 条件概率"
+    ],
+    [
+      "1.1 Independent Events",
+      "独立事件与条件概率"
+    ],
+    [
+      "Chapter 2 Random Variables",
+      "第二章 隨機變數"
+    ]
+  ],
+  "expected_ranges": [
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "note": "Generated clear image-only sample. Labels were specified before OCR. PDF pages, not printed page numbers."
+}

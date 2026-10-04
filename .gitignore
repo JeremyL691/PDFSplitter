@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 test-output/
 .DS_Store
+.codegraph/
+.build/
+.coverage
+.venv/
+.pytest_cache/

@@ -1,0 +1,41 @@
+test_bilingual_samepage_chapters_and_sections (tests.test_core.CoreTests.test_bilingual_samepage_chapters_and_sections) ... ok
+test_depth_samepage (tests.test_core.CoreTests.test_depth_samepage) ... ok
+test_dual_pass_merge (tests.test_core.CoreTests.test_dual_pass_merge) ... ok
+test_failure_and_cancel_cleanup (tests.test_core.CoreTests.test_failure_and_cancel_cleanup) ... ok
+test_happy_export_and_roundtrip (tests.test_core.CoreTests.test_happy_export_and_roundtrip) ... ok
+test_headings (tests.test_core.CoreTests.test_headings) ... ok
+test_manual_rebuild (tests.test_core.CoreTests.test_manual_rebuild) ... ok
+test_nested_outline_parent_and_depth (tests.test_core.CoreTests.test_nested_outline_parent_and_depth) ... ok
+test_partial_outline_and_body_reference (tests.test_core.CoreTests.test_partial_outline_and_body_reference) ... ok
+test_repeated_chapters_with_parts (tests.test_core.CoreTests.test_repeated_chapters_with_parts) ... ok
+test_safety_input_output_and_plan (tests.test_core.CoreTests.test_safety_input_output_and_plan) ... ok
+test_sections_only_group_consecutive_chapters (tests.test_core.CoreTests.test_sections_only_group_consecutive_chapters) ... ok
+test_toc_repeat_and_early_reference (tests.test_core.CoreTests.test_toc_repeat_and_early_reference) ... ok
+test_two_columns (tests.test_core.CoreTests.test_two_columns) ... ok
+test_unicode_paths (tests.test_core.CoreTests.test_unicode_paths) ... ok
+test_analyze_correct_save_rebuild_export_and_drop_parser (tests.test_gui.GUITests.test_analyze_correct_save_rebuild_export_and_drop_parser) ... ok
+test_failed_file_does_not_stop_batch (tests.test_gui.GUITests.test_failed_file_does_not_stop_batch) ... invalid pdf header: b'not a'
+EOF marker not found
+ok
+test_layout_and_theme (tests.test_gui.GUITests.test_layout_and_theme) ... 2026-10-03 23:39:06.970 Python[76292:49389489] error messaging the mach port for IMKCFRunLoopWakeUpReliable
+ok
+test_plan_merge_split_exclude_and_pending_user_text (tests.test_gui.GUITests.test_plan_merge_split_exclude_and_pending_user_text) ... ok
+test_auto_cache_force_and_plan (tests.test_native.NativeTests.test_auto_cache_force_and_plan) ... ok
+test_native_crop_rotation_preview (tests.test_native.NativeTests.test_native_crop_rotation_preview) ... ok
+test_real_multilingual (tests.test_native.NativeTests.test_real_multilingual) ... ok
+test_real_two_column_toc (tests.test_native.NativeTests.test_real_two_column_toc) ... ok
+test_scanned_toc_and_mixed_native_document (tests.test_native.NativeTests.test_scanned_toc_and_mixed_native_document) ... ok
+test_bad_bookmark_is_not_an_anchor (tests.test_recovery.RecoveryTests.test_bad_bookmark_is_not_an_anchor) ... ok
+test_cache_partial_and_parameter_change (tests.test_recovery.RecoveryTests.test_cache_partial_and_parameter_change) ... ok
+test_cancel_closes_process (tests.test_recovery.RecoveryTests.test_cancel_closes_process) ... ok
+test_cli_dryrun_apply_warning_and_depth (tests.test_recovery.RecoveryTests.test_cli_dryrun_apply_warning_and_depth) ... ok
+test_native_corrected_outline_rebuild (tests.test_recovery.RecoveryTests.test_native_corrected_outline_rebuild) ... ok
+test_pending_manual_results_roundtrip (tests.test_recovery.RecoveryTests.test_pending_manual_results_roundtrip) ... ok
+test_plan_cannot_overwrite_input_or_alias (tests.test_recovery.RecoveryTests.test_plan_cannot_overwrite_input_or_alias) ... ok
+test_plan_page_count_and_invalid_schema (tests.test_recovery.RecoveryTests.test_plan_page_count_and_invalid_schema) ... ok
+test_timeout_restarts_and_continues (tests.test_recovery.RecoveryTests.test_timeout_restarts_and_continues) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 15.759s
+
+OK

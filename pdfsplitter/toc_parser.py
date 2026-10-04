@@ -187,19 +187,9 @@ def _parse_hierarchy(raw_label: str) -> tuple[int, ...]:
 
 
 def title_to_label(title: str) -> tuple[int, ...]:
-    cleaned = clean_toc_title(title)
-    if not cleaned:
-        return ()
-
-    for pattern in (GENERIC_PREFIX_RE, NUMBERED_TITLE_RE, BARE_HIERARCHY_RE):
-        match = pattern.match(cleaned)
-        if not match:
-            continue
-        raw_label = match.group("label")
-        parsed = _parse_hierarchy(raw_label)
-        if parsed:
-            return parsed
-    return ()
+    from .headings import parse_heading
+    heading = parse_heading(title)
+    return heading.label if heading else ()
 
 
 def _extract_lines(text: str) -> list[str]:
@@ -253,150 +243,22 @@ def _is_noise_line(line: str) -> bool:
 
 
 def parse_toc_entries(reader: PdfReader, max_scan_pages: int = 40) -> list[TocEntry]:
-    span = find_toc_page_span(reader, max_scan_pages=max_scan_pages)
-    if span is None:
-        return []
-
-    start_index, end_index = span
-    entries: list[TocEntry] = []
-    seen: set[tuple[str, int]] = set()
-    pending_titles: deque[str] = deque()
-
-    for page_index in range(start_index, end_index + 1):
-        text = reader.pages[page_index].extract_text() or ""
-        for raw_line in _extract_lines(text):
-            line = normalize_text(raw_line)
-            if not line or _is_noise_line(line):
-                continue
-
-            if DIGITS_ONLY_RE.match(line):
-                if pending_titles:
-                    title = clean_toc_title(pending_titles.popleft())
-                    printed_page = int(line)
-                    label = title_to_label(title)
-                    if label:
-                        key = (title.lower(), printed_page)
-                        if key not in seen:
-                            seen.add(key)
-                            entries.append(
-                                TocEntry(
-                                    title=title,
-                                    printed_page=printed_page,
-                                    label=label,
-                                    level=len(label),
-                                )
-                            )
-                continue
-
-            if TRAILING_ROMAN_PAGE_RE.match(line):
-                continue
-
-            match = TRAILING_PAGE_RE.match(line)
-            if match:
-                title = clean_toc_title(match.group("title"))
-                printed_page = int(match.group("page"))
-                label = title_to_label(title)
-                if label:
-                    key = (title.lower(), printed_page)
-                    if key not in seen:
-                        seen.add(key)
-                        entries.append(
-                            TocEntry(
-                                title=title,
-                                printed_page=printed_page,
-                                label=label,
-                                level=len(label),
-                            )
-                        )
-                continue
-
-            pending_titles.append(clean_toc_title(line))
-    return entries
-
-
-def _match_key(value: str) -> str:
-    value = clean_toc_title(value)
-    value = re.sub(r"[^0-9A-Za-z]+", " ", value.lower())
-    return re.sub(r"\s+", " ", value).strip()
-
-
-def _find_title_matches(reader: PdfReader, titles: list[str]) -> dict[str, list[int]]:
-    normalized_titles = {title: _match_key(title) for title in titles}
-    matches: dict[str, list[int]] = {title: [] for title in titles}
-    for page_index, page in enumerate(reader.pages):
-        page_text = _match_key(page.extract_text() or "")
-        for title, normalized_title in normalized_titles.items():
-            if normalized_title and normalized_title in page_text:
-                matches[title].append(page_index)
-    return matches
+    from .splitter import _toc_raw, _proxy_pages
+    raw, _ = _toc_raw(_proxy_pages(reader))
+    return [TocEntry(e.title, e.printed_page, e.label, e.level) for e in raw]
 
 
 def resolve_toc_page_indices(reader: PdfReader, entries: list[TocEntry]) -> list[TocEntry]:
-    if not entries:
-        return []
-
-    title_matches = _find_title_matches(reader, [entry.title for entry in entries])
-    toc_span = find_toc_page_span(reader) or (0, 0)
-    toc_end_index = toc_span[1]
-
-    chapter_entries = sorted((entry for entry in entries if len(entry.label) == 1), key=lambda item: item.label)
-    chapter_entry_map = {entry.label[0]: entry for entry in chapter_entries}
-    chapter_starts: dict[int, int] = {}
-    for chapter in chapter_entries:
-        candidate_matches = [page for page in title_matches.get(chapter.title, []) if page > toc_end_index]
-        if candidate_matches:
-            chapter_starts[chapter.label[0]] = min(candidate_matches)
-
-    if not chapter_starts:
-        return []
-
-    resolved: list[TocEntry] = []
-    sorted_chapter_numbers = sorted(chapter_starts)
-    for entry in entries:
-        if len(entry.label) == 1:
-            page_index = chapter_starts.get(entry.label[0])
-            if page_index is None:
-                continue
-        else:
-            chapter_number = entry.label[0]
-            chapter_start = chapter_starts.get(chapter_number)
-            if chapter_start is None:
-                continue
-            chapter_entry = chapter_entry_map[chapter_number]
-            if entry.printed_page == chapter_entry.printed_page:
-                page_index = chapter_start
-                resolved.append(
-                    TocEntry(
-                        title=entry.title,
-                        printed_page=entry.printed_page,
-                        label=entry.label,
-                        level=entry.level,
-                        pdf_page_index=page_index,
-                    )
-                )
-                continue
-            later_chapters = [number for number in sorted_chapter_numbers if number > chapter_number]
-            next_chapter_start = chapter_starts[later_chapters[0]] if later_chapters else len(reader.pages)
-            predicted_page = chapter_start + (entry.printed_page - chapter_entry.printed_page)
-            predicted_page = max(chapter_start, min(predicted_page, next_chapter_start - 1))
-            candidate_matches = [
-                page
-                for page in title_matches.get(entry.title, [])
-                if chapter_start <= page < next_chapter_start
-            ]
-            if candidate_matches:
-                closest = min(candidate_matches, key=lambda page: abs(page - predicted_page))
-                page_index = closest if abs(closest - predicted_page) <= 2 else predicted_page
-            else:
-                page_index = predicted_page
-
-        resolved.append(
-            TocEntry(
-                title=entry.title,
-                printed_page=entry.printed_page,
-                label=entry.label,
-                level=entry.level,
-                pdf_page_index=page_index,
-            )
-        )
-    return resolved
+    from .splitter import _toc_raw, _proxy_pages, _page_headings, _toc_resolve
+    from .models import StructureEntry
+    from .headings import parse_heading
+    pages = _proxy_pages(reader)
+    _, span = _toc_raw(pages)
+    raw = []
+    for e in entries:
+        h = parse_heading(e.title)
+        if h:
+            raw.append(StructureEntry(e.title, -1, e.level, e.label, kind=h.kind,
+                                      display_label=h.display, source='toc', printed_page=e.printed_page))
+    result = _toc_resolve(raw, _page_headings(pages, span), reader, span, [])
+    return [TocEntry(e.title, e.printed_page, e.label, e.level, e.page_index) for e in result]

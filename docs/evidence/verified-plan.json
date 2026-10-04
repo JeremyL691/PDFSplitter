@@ -1,0 +1,706 @@
+{
+  "input_pdf": "docs/evidence/annotated-scan.pdf",
+  "input_sha256": "fa658585e81e47e4dfb55c516bcd26235c1bafad143b04332a7a4ab264d7953f",
+  "total_pages": 4,
+  "pages": [
+    {
+      "page_no": 1,
+      "blocks": [
+        {
+          "text": "Contents",
+          "bbox": [
+            0.08259794205572916,
+            0.06375568973603163,
+            0.12627145804610906,
+            0.01999415079752609
+          ],
+          "confidence": 1,
+          "source": "ocr_en",
+          "candidates": [
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Contents"
+            },
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Content"
+            },
+            {
+              "bbox": [
+                0.08259794205572916,
+                0.06375568973603163,
+                0.12627145804610906,
+                0.01999415079752609
+              ],
+              "candidates": [],
+              "confidence": 0.5,
+              "segments": [
+                {
+                  "bbox": [
+                    0.08259794276402932,
+                    0.06375568848168656,
+                    0.12627145804610906,
+                    0.01999415310946373
+                  ],
+                  "end": 8,
+                  "start": 0,
+                  "text": "Contents"
+                }
+              ],
+              "source": "ocr_zh",
+              "text": "Contents"
+            }
+          ],
+          "original_text": null
+        },
+        {
+          "text": "Chapter 1 Conditional Probability .... 1",
+          "bbox": [
+            0.08270677060292299,
+            0.11046511579113838,
+            0.5131578871783088,
+            0.021802326549183237
+          ],
+          "confidence": 1,
+          "source": "ocr_en",
+          "candidates": [
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chapter 1 Conditional Probability.... 1"
+            },
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chapter 1 Conditional Probability .... 1"
+            },
+            {
+              "bbox": [
+                0.08270677060292299,
+                0.11046511579113838,
+                0.5131578871783088,
+                0.021802326549183237
+              ],
+              "candidates": [],
+              "confidence": 0.30000001192092896,
+              "segments": [
+                {
+                  "bbox": [
+                    0.08270674439856686,
+                    0.11046511579113838,
+                    0.456754030713848,
+                    0.021802326549183237
+                  ],
+                  "end": 33,
+                  "start": 0,
+                  "text": "Chapter 1 Conaitional Probability"
+                },
+                {
+                  "bbox": [
+                    0.5853137254901961,
+                    0.11046511627906974,
+                    0.010550935975273124,
+                    0.021802325573320402
+                  ],
+                  "end": 39,
+                  "start": 38,
+                  "text": "1"
+                }
+              ],
+              "source": "ocr_zh",
+              "text": "Chapter 1 Conaitional Probability ....1"
+            }
+          ],
+          "original_text": null
+        },
+        {
+          "text": "1.1 Independent Events .... 2",
+          "bbox": [
+            0.08270676873512439,
+            0.15696969690916007,
+            0.3815789435891544,
+            0.021818181818181848
+          ],
+          "confidence": 1,
+          "source": "ocr_en",
+          "candidates": [
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "1.1 Independent Events.... 2"
+            },
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "1.1 Independent Events ....2"
+            },
+            {
+              "bbox": [
+                0.08270676873512439,
+                0.15696969690916007,
+                0.3815789435891544,
+                0.021818181818181848
+              ],
+              "candidates": [],
+              "confidence": 0.30000001192092896,
+              "segments": [
+                {
+                  "bbox": [
+                    0.08270676696399383,
+                    0.15696969696969698,
+                    0.015567742839927734,
+                    0.021818181818181848
+                  ],
+                  "end": 1,
+                  "start": 0,
+                  "text": "1"
+                },
+                {
+                  "bbox": [
+                    0.10886274023617017,
+                    0.15696969696969698,
+                    0.29584314682904406,
+                    0.021818181818181848
+                  ],
+                  "end": 22,
+                  "start": 2,
+                  "text": "1 Inaependent Events"
+                },
+                {
+                  "bbox": [
+                    0.44768627450980386,
+                    0.15696969696969698,
+                    0.016599439585605502,
+                    0.021818181818181848
+                  ],
+                  "end": 27,
+                  "start": 26,
+                  "text": "2"
+                }
+              ],
+              "source": "ocr_zh",
+              "text": "1.1 Inaependent Events ...2"
+            }
+          ],
+          "original_text": null
+        },
+        {
+          "text": "Chapter 2 Random Variables .... 3",
+          "bbox": [
+            0.08270677543636727,
+            0.20058139485908244,
+            0.45864659926470586,
+            0.021842847881895056
+          ],
+          "confidence": 1,
+          "source": "ocr_en",
+          "candidates": [
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chapter 2 Random Variables.... 3"
+            },
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chapter 2 Random Variables .... 3"
+            },
+            {
+              "bbox": [
+                0.08270677543636727,
+                0.20058139485908244,
+                0.45864659926470586,
+                0.021842847881895056
+              ],
+              "candidates": [],
+              "confidence": 0.5,
+              "segments": [
+                {
+                  "bbox": [
+                    0.08270676316474625,
+                    0.20058139494559224,
+                    0.4038030407475491,
+                    0.021842847881895167
+                  ],
+                  "end": 26,
+                  "start": 0,
+                  "text": "Chapter 2 Random Variables"
+                },
+                {
+                  "bbox": [
+                    0.5231372549019608,
+                    0.20058139534883723,
+                    0.018216128314143987,
+                    0.02184284707540518
+                  ],
+                  "end": 32,
+                  "start": 31,
+                  "text": "3"
+                }
+              ],
+              "source": "ocr_zh",
+              "text": "Chapter 2 Random Variables.... 3"
+            }
+          ],
+          "original_text": null
+        }
+      ],
+      "source": "ocr",
+      "status": "ready",
+      "error": null,
+      "cached": false
+    },
+    {
+      "page_no": 2,
+      "blocks": [
+        {
+          "text": "Chapter 1 Conditional Probability",
+          "bbox": [
+            0.08260569595903124,
+            0.06252895954658932,
+            0.45699640012254894,
+            0.024737833196466608
+          ],
+          "confidence": 1,
+          "source": "ocr_en",
+          "candidates": [
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chapter1 Conditional Probability"
+            },
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chaper 1 Conditional Probability"
+            },
+            {
+              "bbox": [
+                0.08260569595903124,
+                0.06252895954658932,
+                0.45699640012254894,
+                0.024737833196466608
+              ],
+              "candidates": [],
+              "confidence": 0.5,
+              "segments": [
+                {
+                  "bbox": [
+                    0.08260569109420078,
+                    0.06252895330685815,
+                    0.45699640012254894,
+                    0.024737845912124135
+                  ],
+                  "end": 33,
+                  "start": 0,
+                  "text": "Chapter 1 Conditional Probability"
+                }
+              ],
+              "source": "ocr_zh",
+              "text": "Chapter 1 Conditional Probability"
+            }
+          ],
+          "original_text": null
+        },
+        {
+          "text": "第一章 条件概率",
+          "bbox": [
+            0.08458646283298772,
+            0.11046511578438256,
+            0.2030075252757353,
+            0.02180232654918335
+          ],
+          "confidence": 0.30000001192092896,
+          "source": "ocr_zh",
+          "candidates": [],
+          "original_text": null
+        }
+      ],
+      "source": "ocr",
+      "status": "ready",
+      "error": null,
+      "cached": false
+    },
+    {
+      "page_no": 3,
+      "blocks": [
+        {
+          "text": "1.1 Independent Events",
+          "bbox": [
+            0.08258838270039222,
+            0.06384408234320749,
+            0.32354899088541667,
+            0.02395910320859962
+          ],
+          "confidence": 1,
+          "source": "ocr_en",
+          "candidates": [
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "1.1 Independent Event"
+            },
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "11 Independent Events"
+            },
+            {
+              "bbox": [
+                0.08258838270039222,
+                0.06384408234320749,
+                0.32354899088541667,
+                0.02395910320859962
+              ],
+              "candidates": [],
+              "confidence": 0.5,
+              "segments": [
+                {
+                  "bbox": [
+                    0.08258862586511717,
+                    0.06534012331252825,
+                    0.015924700246336146,
+                    0.022463061706648135
+                  ],
+                  "end": 1,
+                  "start": 0,
+                  "text": "1"
+                },
+                {
+                  "bbox": [
+                    0.10906821646177828,
+                    0.06384407669858094,
+                    0.2970691636029411,
+                    0.023830330588600845
+                  ],
+                  "end": 22,
+                  "start": 2,
+                  "text": "1 Inaependent Events"
+                }
+              ],
+              "source": "ocr_zh",
+              "text": "1.1 Inaependent Events"
+            }
+          ],
+          "original_text": null
+        },
+        {
+          "text": "独立事件与条件概率",
+          "bbox": [
+            0.0827067627748283,
+            0.11046511621621946,
+            0.2537594065946691,
+            0.023255814061020397
+          ],
+          "confidence": 0.5,
+          "source": "ocr_zh",
+          "candidates": [
+            {
+              "bbox": [
+                0.0827067627748283,
+                0.11046511621621946,
+                0.2537594065946691,
+                0.023255814061020397
+              ],
+              "candidates": [
+                {
+                  "confidence": 0.30000001192092896,
+                  "source": "ocr_en",
+                  "text": "éừ5⅗14‡"
+                },
+                {
+                  "confidence": 0.30000001192092896,
+                  "source": "ocr_en",
+                  "text": "éừ5⅗14‡"
+                }
+              ],
+              "confidence": 0.30000001192092896,
+              "segments": [
+                {
+                  "bbox": [
+                    0.0827067669231673,
+                    0.11046511627906974,
+                    0.2537593982979911,
+                    0.023255813935319836
+                  ],
+                  "end": 3,
+                  "start": 2,
+                  "text": "5"
+                },
+                {
+                  "bbox": [
+                    0.0827067627748283,
+                    0.11046511621621946,
+                    0.2537594065946691,
+                    0.023255814061020397
+                  ],
+                  "end": 6,
+                  "start": 4,
+                  "text": "14"
+                }
+              ],
+              "source": "ocr_en",
+              "text": "éừ5⅗14‡"
+            }
+          ],
+          "original_text": null
+        }
+      ],
+      "source": "ocr",
+      "status": "ready",
+      "error": null,
+      "cached": false
+    },
+    {
+      "page_no": 4,
+      "blocks": [
+        {
+          "text": "Chapter 2 Random Variables",
+          "bbox": [
+            0.08258896010850883,
+            0.061217807286923054,
+            0.39872479607077216,
+            0.02488828948049837
+          ],
+          "confidence": 1,
+          "source": "ocr_en",
+          "candidates": [
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chapter 2 Random Variable"
+            },
+            {
+              "confidence": 1,
+              "source": "ocr_en",
+              "text": "Chaper 2 Random Variables"
+            },
+            {
+              "bbox": [
+                0.08258896010850883,
+                0.061217807286923054,
+                0.39872479607077216,
+                0.02488828948049837
+              ],
+              "candidates": [],
+              "confidence": 0.5,
+              "segments": [
+                {
+                  "bbox": [
+                    0.08258896014554257,
+                    0.06121780317376935,
+                    0.3987247960707721,
+                    0.02488829872824927
+                  ],
+                  "end": 26,
+                  "start": 0,
+                  "text": "Chapter 2 Random Variables"
+                }
+              ],
+              "source": "ocr_zh",
+              "text": "Chapter 2 Random Variables"
+            }
+          ],
+          "original_text": null
+        },
+        {
+          "text": "第二章 隨機變數",
+          "bbox": [
+            0.0845864628712176,
+            0.11046511578003537,
+            0.20300752527573532,
+            0.021802326549183126
+          ],
+          "confidence": 0.5,
+          "source": "ocr_zh",
+          "candidates": [],
+          "original_text": null
+        }
+      ],
+      "source": "ocr",
+      "status": "ready",
+      "error": null,
+      "cached": false
+    }
+  ],
+  "entries": [
+    {
+      "title": "Chapter 1 Conditional Probability",
+      "page_index": 1,
+      "level": 1,
+      "label": [
+        1
+      ],
+      "id": "toc-1-chapter-1-1",
+      "parent_id": null,
+      "kind": "chapter",
+      "display_label": "1",
+      "source": "toc",
+      "printed_page": 1,
+      "evidence": [
+        "Standalone body heading"
+      ]
+    },
+    {
+      "title": "1.1 Independent Events",
+      "page_index": 2,
+      "level": 2,
+      "label": [
+        1,
+        1
+      ],
+      "id": "toc-2-section-1.1-1",
+      "parent_id": "toc-1-chapter-1-1",
+      "kind": "section",
+      "display_label": "1.1",
+      "source": "toc",
+      "printed_page": 2,
+      "evidence": [
+        "Standalone body heading"
+      ]
+    },
+    {
+      "title": "Chapter 2 Random Variables",
+      "page_index": 3,
+      "level": 1,
+      "label": [
+        2
+      ],
+      "id": "toc-3-chapter-2-1",
+      "parent_id": null,
+      "kind": "chapter",
+      "display_label": "2",
+      "source": "toc",
+      "printed_page": 3,
+      "evidence": [
+        "Standalone body heading"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "chapter_label": "1",
+      "chapter_title": "Conditional Probability",
+      "section_label": "00",
+      "section_title": "Chapter Intro",
+      "start_page": 2,
+      "end_page": 2,
+      "chapter_dir_name": "Chapter 1 - Conditional Probability",
+      "file_name": "00 Chapter Intro.pdf",
+      "entry_ids": [
+        "toc-1-chapter-1-1"
+      ],
+      "excluded": false,
+      "manual": false,
+      "part_id": null
+    },
+    {
+      "chapter_label": "1",
+      "chapter_title": "Conditional Probability",
+      "section_label": "1.1",
+      "section_title": "Independent Events",
+      "start_page": 3,
+      "end_page": 3,
+      "chapter_dir_name": "Chapter 1 - Conditional Probability",
+      "file_name": "01 1.1 Independent Events.pdf",
+      "entry_ids": [
+        "toc-2-section-1.1-1"
+      ],
+      "excluded": false,
+      "manual": false,
+      "part_id": null
+    },
+    {
+      "chapter_label": "2",
+      "chapter_title": "Random Variables",
+      "section_label": "2",
+      "section_title": "Random Variables",
+      "start_page": 4,
+      "end_page": 4,
+      "chapter_dir_name": "Chapter 2 - Random Variables",
+      "file_name": "01 Random Variables.pdf",
+      "entry_ids": [
+        "toc-3-chapter-2-1"
+      ],
+      "excluded": false,
+      "manual": false,
+      "part_id": null
+    }
+  ],
+  "warnings": [
+    {
+      "code": "low_confidence",
+      "message": "Some OCR text has low model confidence; inspect this page.",
+      "severity": "warning",
+      "page_no": 2
+    }
+  ],
+  "metadata": {
+    "version": "0.3.0",
+    "structure_source": "toc",
+    "total_pages": 4,
+    "detected_entries": 3,
+    "include_chapter_intro": true,
+    "max_section_depth": null,
+    "ocr": {
+      "mode": "auto",
+      "languages": "mixed",
+      "dpi": 300,
+      "cache": false
+    },
+    "native": {
+      "dark": true,
+      "event": "capabilities",
+      "languages": [
+        "en-US",
+        "fr-FR",
+        "it-IT",
+        "de-DE",
+        "es-ES",
+        "pt-BR",
+        "zh-Hans",
+        "zh-Hant",
+        "yue-Hans",
+        "yue-Hant",
+        "ko-KR",
+        "ja-JP",
+        "ru-RU",
+        "uk-UA",
+        "th-TH",
+        "vi-VT",
+        "ar-SA",
+        "ars-SA",
+        "tr-TR",
+        "id-ID",
+        "cs-CZ",
+        "da-DK",
+        "nl-NL",
+        "no-NO",
+        "nn-NO",
+        "nb-NO",
+        "ms-MY",
+        "pl-PL",
+        "ro-RO",
+        "sv-SE",
+        "fi-FI",
+        "hi-IN",
+        "mr-IN"
+      ],
+      "os": "Version 27.0 (Build 26A428)",
+      "protocol_version": 1,
+      "reduce_motion": false,
+      "revision": 3
+    }
+  },
+  "omitted_pages": {
+    "front_matter": [
+      1
+    ],
+    "excluded_or_intro": []
+  },
+  "dirty": false,
+  "schema_version": 1,
+  "pending_pages": {}
+}

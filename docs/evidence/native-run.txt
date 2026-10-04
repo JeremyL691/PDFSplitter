@@ -1,0 +1,88 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "architecture": "arm64",
+  "python": "3.12.0 (v3.12.0:0fb18b02c8, Oct  2 2023, 09:45:56) [Clang 13.0.0 (clang-1300.0.29.30)]",
+  "input_sha256": "fa658585e81e47e4dfb55c516bcd26235c1bafad143b04332a7a4ab264d7953f",
+  "native": {
+    "dark": true,
+    "event": "capabilities",
+    "languages": [
+      "en-US",
+      "fr-FR",
+      "it-IT",
+      "de-DE",
+      "es-ES",
+      "pt-BR",
+      "zh-Hans",
+      "zh-Hant",
+      "yue-Hans",
+      "yue-Hant",
+      "ko-KR",
+      "ja-JP",
+      "ru-RU",
+      "uk-UA",
+      "th-TH",
+      "vi-VT",
+      "ar-SA",
+      "ars-SA",
+      "tr-TR",
+      "id-ID",
+      "cs-CZ",
+      "da-DK",
+      "nl-NL",
+      "no-NO",
+      "nn-NO",
+      "nb-NO",
+      "ms-MY",
+      "pl-PL",
+      "ro-RO",
+      "sv-SE",
+      "fi-FI",
+      "hi-IN",
+      "mr-IN"
+    ],
+    "os": "Version 27.0 (Build 26A428)",
+    "protocol_version": 1,
+    "reduce_motion": false,
+    "revision": 3
+  },
+  "expected_ranges": [
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "actual_ranges": [
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      3
+    ],
+    [
+      4,
+      4
+    ]
+  ],
+  "exact_page_text_match": true,
+  "original_unchanged": true,
+  "exported_pdfs": 3,
+  "warnings": [
+    {
+      "code": "low_confidence",
+      "message": "Some OCR text has low model confidence; inspect this page.",
+      "severity": "warning",
+      "page_no": 2
+    }
+  ]
+}
